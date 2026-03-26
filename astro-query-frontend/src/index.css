@@ -1,0 +1,28 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: radial-gradient(ellipse at 20% 40%, #040c18 0%, #020608 55%, #000 100%);
+  min-height: 100vh;
+  font-family: 'Courier New', monospace;
+  color: #c8dff0;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: #030810;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1a3a5a;
+}
+
+::placeholder {
+  color: #0e2030;
+}
