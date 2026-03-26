@@ -69,13 +69,6 @@ class ListItem(BaseModel):
     notable:           Optional[str]  = None
 
 
-class SingleResponse(BaseModel):
-    mode:       str = 'single'
-    object:     ObjectResult
-    sources:    List[str] = []
-    confidence: str = 'high'
-    warnings:   Optional[str] = None
-
 
 class ListResponse(BaseModel):
     mode:                 str = 'list'
@@ -89,3 +82,48 @@ class ErrorResponse(BaseModel):
     mode:        str = 'error'
     message:     str
     suggestions: List[str] = []
+
+class HipparcosData(BaseModel):
+    hip_id:       Optional[int]   = None
+    magnitude_v:  Optional[float] = None
+    color_bv:     Optional[float] = None
+    parallax_mas: Optional[float] = None
+    parallax_err: Optional[float] = None
+    distance_ly:  Optional[float] = None
+    pm_ra:        Optional[float] = None
+    pm_dec:       Optional[float] = None
+    catalog:      str = 'Hipparcos I/239'
+
+
+class TwoMassData(BaseModel):
+    two_mass_id: Optional[str]   = None
+    j_mag:       Optional[float] = None
+    h_mag:       Optional[float] = None
+    k_mag:       Optional[float] = None
+    quality:     Optional[str]   = None
+    catalog:     str = '2MASS II/246'
+
+
+class AdsArticle(BaseModel):
+    title:    str
+    authors:  List[str] = []
+    et_al:    bool = False
+    year:     Optional[str] = None
+    bibcode:  Optional[str] = None
+    doi:      Optional[str] = None
+    abstract: Optional[str] = None
+    ads_url:  Optional[str] = None
+
+
+class Enrichments(BaseModel):
+    hipparcos:    Optional[HipparcosData]    = None
+    two_mass:     Optional[TwoMassData]      = None
+
+class SingleResponse(BaseModel):
+    mode:        str = 'single'
+    object:      ObjectResult
+    enrichments: Optional[Enrichments] = None
+    sources:     List[str] = []
+    confidence:  str = 'high'
+    warnings:    Optional[str] = None
+    ads_articles: Optional[List[AdsArticle]] = None

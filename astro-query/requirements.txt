@@ -8,8 +8,10 @@ beautifulsoup4==4.14.3
 certifi==2026.2.25
 cffi==2.0.0
 charset-normalizer==3.4.6
+click==8.3.1
 cryptography==46.0.6
 fastapi==0.135.2
+h11==0.16.0
 html5lib==1.1
 idna==3.11
 jaraco.classes==3.4.0
@@ -35,4 +37,5 @@ starlette==1.0.0
 typing-inspection==0.4.2
 typing_extensions==4.15.0
 urllib3==2.6.3
+uvicorn==0.42.0
 webencodings==0.5.1
