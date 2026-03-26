@@ -9,9 +9,9 @@ orbital mechanics, stellar structure, spectral analysis, general relativity.
 
 ### repositories
 
-| repo | description | stack |
-|------|-------------|-------|
-| [astro-query] (https://github.com/cosmic-axolotl/astronomy-n-science/tree/main/astro-query) | A LLM destined to the search of astronomical objects | Python, HTTP, JSON | work in progress... |
+| repo | description | stack | status |
+|------|-------------|-------| ------ |
+| [astro-query](https://github.com/cosmic-axolotl/astronomy-n-science/tree/main/astro-query) | A LLM destined to the search of astronomical objects | Python, HTTP, JSON | work in progress... |
 | [astro-simulations](#) | N-body, Keplerian orbits, dynamical systems | Julia, Python | coming soon! |
 | [stellar-analysis](#) | H-R diagrams, spectra, stellar evolution | Astropy, Matplotlib | coming soon! |
 | [observing-log](#) | FITS pipeline, photometric reduction | Python, Astropy | coming soon! |
