@@ -11,11 +11,12 @@ orbital mechanics, stellar structure, spectral analysis, general relativity.
 
 | repo | description | stack |
 |------|-------------|-------|
-| [astro-simulations](#) | N-body, Keplerian orbits, dynamical systems | Julia, Python |
-| [stellar-analysis](#) | H-R diagrams, spectra, stellar evolution | Astropy, Matplotlib |
-| [observing-log](#) | FITS pipeline, photometric reduction | Python, Astropy |
-| [gr-toolkit](#) | symbolic GR — Schwarzschild, FRW, Kerr | Wolfram Language |
-| [fortran-stellar](#) | Lane-Emden, Godunov, legacy code | Fortran 90/2008 |
+| [astro-query] (https://github.com/cosmic-axolotl/astronomy-n-science/tree/main/astro-query) | A LLM destined to the search of astronomical objects | Python, HTTP, JSON | work in progress... |
+| [astro-simulations](#) | N-body, Keplerian orbits, dynamical systems | Julia, Python | coming soon! |
+| [stellar-analysis](#) | H-R diagrams, spectra, stellar evolution | Astropy, Matplotlib | coming soon! |
+| [observing-log](#) | FITS pipeline, photometric reduction | Python, Astropy | coming soon! |
+| [gr-toolkit](#) | symbolic GR — Schwarzschild, FRW, Kerr | Wolfram Language | coming soon! |
+| [fortran-stellar](#) | Lane-Emden, Godunov, legacy code | Fortran 90/2008 | coming soon! |
 
 ---
 
