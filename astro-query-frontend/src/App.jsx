@@ -3,7 +3,9 @@ import StarField from './components/StarField';
 import SearchBar from './components/SearchBar';
 import ObjectCard from './components/ObjectCard';
 import ResultTable from './components/ResultTable';
-import { searchObject, searchByType } from './api';
+import ClusterCard from './components/ClusterCard';
+import ListItemModal from './components/ListItemModal';
+import { searchObject, searchByType, searchCluster } from './api';
 
 export default function App() {
   const [query, setQuery] = useState('');
@@ -12,6 +14,8 @@ export default function App() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [view, setView] = useState('cards');
+  const [selectedObj, setSelectedObj] = useState(null);
+  const [limit, setLimit] = useState(20);
 
   const handleSearch = useCallback(async (q) => {
     const term = (q ?? query).trim();
@@ -22,17 +26,25 @@ export default function App() {
     setError(null);
 
     try {
-      // Tenta busca por tipo primeiro se tiver palavras-chave de classe
       const classKeywords = [
         'wolf rayet', 'pulsar', 'cepheid', 'white dwarf', 'galaxy',
         'quasar', 'neutron star', 'supergiant', 'red giant', 'brown dwarf',
-        'planetary nebula', 'supernova', 'black hole', 'globular', 'open cluster',
-        'agn', 'rr lyrae',
+        'planetary nebula', 'supernova', 'black hole', 'agn', 'rr lyrae',
       ];
-      const isClassQuery = classKeywords.some(kw => term.toLowerCase().includes(kw));
 
-      if (isClassQuery) {
-        const data = await searchByType(term);
+      const clusterKeywords = [
+        'cluster', 'aglomerado', 'pleiades', 'hyades', 'praesepe',
+        'omega centauri', 'globular', 'open cluster',
+      ];
+
+      const isClusterQuery = clusterKeywords.some(kw => term.toLowerCase().includes(kw));
+      const isClassQuery = classKeywords.some(kw => term.toLowerCase().includes(kw)) && !isClusterQuery;
+
+      if (isClusterQuery) {
+        const data = await searchCluster(term, limit);
+        setResult({ mode: 'cluster', ...data });
+      } else if (isClassQuery) {
+        const data = await searchByType(term, limit);
         setResult({ mode: 'list', ...data });
       } else {
         const data = await searchObject(term, options);
@@ -49,7 +61,7 @@ export default function App() {
     } finally {
       setLoading(false);
     }
-  }, [query, options]);
+  }, [query, options, limit]);
 
   return (
     <div style={{ minHeight: '100vh', position: 'relative' }}>
@@ -82,6 +94,8 @@ export default function App() {
           setOptions={setOptions}
           onSearch={handleSearch}
           loading={loading}
+          limit={limit}
+          setLimit={setLimit}
         />
 
         {/* Loading */}
@@ -113,6 +127,11 @@ export default function App() {
         {/* Single result */}
         {result?.mode === 'single' && (
           <ObjectCard data={result} />
+        )}
+
+        {/* Cluster result */}
+        {result?.mode === 'cluster' && (
+          <ClusterCard data={result} />
         )}
 
         {/* List result */}
@@ -147,11 +166,21 @@ export default function App() {
             {view === 'cards' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
                 {result.results?.map((obj, i) => (
-                  <div key={i} style={{
-                    background: '#040b14', border: '1px solid #0e2540',
-                    borderLeft: `3px solid #4a9fd4`, borderRadius: '4px',
-                    padding: '14px 16px',
-                  }}>
+                  <div
+                    key={i}
+                    onClick={() => setSelectedObj(selectedObj?.name === obj.name ? null : obj)}
+                    style={{
+                      background: selectedObj?.name === obj.name ? '#06101c' : '#040b14',
+                      border: `1px solid ${selectedObj?.name === obj.name ? '#1e4a7a' : '#0e2540'}`,
+                      borderLeft: '3px solid #4a9fd4',
+                      borderRadius: '4px',
+                      padding: '14px 16px',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background = '#05101a'; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = selectedObj?.name === obj.name ? '#06101c' : '#040b14'; }}
+                  >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                       <div>
                         <span style={{ fontFamily: 'Georgia, serif', fontSize: '16px', color: '#d8eeff' }}>
@@ -181,19 +210,20 @@ export default function App() {
                         {obj.notable}
                       </div>
                     )}
-                    <div style={{ marginTop: '6px' }}>
-                      <a
-                        href={`https://simbad.u-strasbg.fr/simbad/sim-id?Ident=${encodeURIComponent(obj.name)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ color: '#1a4a6a', fontFamily: 'monospace', fontSize: '9px', textDecoration: 'none' }}
-                      >
-                        → SIMBAD
-                      </a>
+                    <div style={{ marginTop: '6px', color: '#1a4a6a', fontFamily: 'monospace', fontSize: '9px' }}>
+                      clique para ver detalhes →
                     </div>
                   </div>
                 ))}
               </div>
+            )}
+
+            {/* Modal */}
+            {selectedObj && (
+              <ListItemModal
+                obj={selectedObj}
+                onClose={() => setSelectedObj(null)}
+              />
             )}
 
             {/* Table */}
@@ -201,6 +231,6 @@ export default function App() {
           </>
         )}
       </div>
-    </div >
+    </div>
   );
 }

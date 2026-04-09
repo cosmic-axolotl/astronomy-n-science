@@ -24,7 +24,18 @@ export async function searchByType(query, limit = 20) {
     return response.data;
 }
 
+
 export async function checkHealth() {
     const response = await api.get('/');
     return response.data;
+}
+
+export async function searchCluster(name, limit = 50) {
+    try {
+        const response = await api.get('/search/cluster', { params: { name, limit } });
+        return response.data;
+    } catch (err) {
+        console.error('searchCluster error:', err.response?.status, err.response?.data);
+        throw err;
+    }
 }
