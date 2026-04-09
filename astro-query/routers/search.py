@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Query, HTTPException
 from typing import Optional
 from services.crossmatch import enrich_object
-from services.simbad import query_by_type
+from services.simbad import query_single_object, query_by_type, query_cluster_members
 from models.schemas import (
     SingleResponse, ListResponse,
     ObjectResult, ListItem, Coordinates, Magnitude,
@@ -169,3 +169,46 @@ async def search_by_type(
         results=items,
         sources=['SIMBAD'],
     )
+
+from services.simbad import query_single_object, query_by_type, query_cluster_members, query_cluster_info
+
+@router.get('/cluster')
+async def search_cluster(
+    name:  str = Query(..., description='Nome do aglomerado: Pleiades, Hyades, NGC 2516...'),
+    limit: int = Query(50, ge=1, le=200),
+):
+    '''Busca um aglomerado estelar e seus membros catalogados.'''
+    try:
+        raw = query_cluster_info(name)
+    except Exception:
+        raise HTTPException(status_code=503, detail='Serviço indisponível.')
+
+    if raw is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f'Aglomerado {name!r} não encontrado.',
+        )
+
+    members = query_cluster_members(raw['name'], limit=limit)
+
+    coords = None
+    if raw.get('ra') and raw.get('dec'):
+        coords = Coordinates(ra=raw['ra'], dec=raw['dec'])
+
+    obj = ObjectResult(
+        name=raw['name'],
+        aliases=raw.get('aliases', []),
+        object_type=raw['object_type'] or 'OpC',
+        coordinates=coords,
+        distance_pc=raw.get('distance_pc'),
+        distance_ly=raw.get('distance_ly'),
+        catalogs=raw.get('catalogs', ['SIMBAD']),
+    )
+
+    return {
+        'mode':          'cluster',
+        'cluster':       obj,
+        'members':       members,
+        'sources':       ['SIMBAD'],
+        'total_members': len(members),
+    }

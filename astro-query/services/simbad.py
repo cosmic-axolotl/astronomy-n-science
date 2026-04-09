@@ -123,3 +123,65 @@ def query_by_type(otype_code: str, limit: int = 30) -> list:
     except Exception as e:
         logger.error(f'Erro ao buscar tipo {otype_code!r}: {e}')
         return []
+    
+def query_cluster_members(canonical_name: str, limit: int = 50) -> list:
+    '''
+    Busca membros de um aglomerado via SIMBAD TAP.
+    Recebe o nome canônico já resolvido (ex: 'Cl Melotte  22').
+    '''
+    try:
+        canonical_escaped = canonical_name.replace("'", "''")
+
+        query = f"""
+            SELECT TOP {limit}
+                b.main_id, b.ra, b.dec, b.otype,
+                b.sp_type, b.plx_value,
+                b.rvz_radvel, b.rvz_redshift
+            FROM basic AS b
+            JOIN h_link AS h ON h.child = b.oid
+            JOIN basic AS parent ON parent.oid = h.parent
+            WHERE parent.main_id = '{canonical_escaped}'
+        """
+
+        result = Simbad.query_tap(query)
+
+        if result is None or len(result) == 0:
+            return []
+
+        return [_tap_row_to_dict(row) for row in result]
+
+    except Exception as e:
+        logger.error(f'Erro ao buscar membros de {canonical_name!r}: {e}')
+        return []
+
+def query_cluster_info(name: str) -> dict | None:
+    '''
+    Busca informações básicas de um aglomerado pelo nome.
+    Usa cliente SIMBAD simples sem campos extras que podem falhar.
+    '''
+    try:
+        simbad = Simbad()
+        result = simbad.query_object(name)
+
+        if result is None or len(result) == 0:
+            return None
+
+        row = result[0]
+        plx = _safe(row['plx_value'], float) if 'plx_value' in result.colnames else None
+        dist_pc, dist_ly = _parallax_to_distance(plx)
+
+        return {
+            'name':        str(row['main_id']).strip(),
+            'aliases':     [],
+            'object_type': str(row['otype']).strip() if 'otype' in result.colnames else 'Cl*',
+            'ra':          str(row['ra']),
+            'dec':         str(row['dec']),
+            'distance_pc': dist_pc,
+            'distance_ly': dist_ly,
+            'parallax_mas':plx,
+            'catalogs':    ['SIMBAD'],
+        }
+
+    except Exception as e:
+        logger.error(f'Erro ao buscar aglomerado {name!r}: {e}')
+        return None
