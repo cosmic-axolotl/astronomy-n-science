@@ -16,6 +16,7 @@ ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'http://localhost:5173',
     'http://127.0.0.1:3000',
+    'http://0.0.0.0:3000',
     'http://127.0.0.1:5173',
     'https://cosmic-axolotl.github.io',
     'https://cosmic-axolotl.github.io/astronomy-n-science/',
@@ -24,11 +25,10 @@ ALLOWED_ORIGINS = [
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
-    allow_credentials=True,
+    allow_credentials=False, 
     allow_methods=['GET', 'POST', 'OPTIONS'],
     allow_headers=['*'],
 )
-
 app.include_router(search.router)
 
 
